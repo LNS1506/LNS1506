@@ -1,0 +1,45 @@
+name: Deploy Frontend and Backend
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # - name: Checkout code
+      #   uses: actions/checkout@v3
+
+      # # Build frontend
+      # - name: Build frontend
+      #   run: |
+      #     cd client
+      #     npm install --legacy-peer-deps
+      #     NODE_OPTIONS=--openssl-legacy-provider npx react-scripts build
+      #   env:
+      #     CI: false
+          
+      # - name: Upload frontend to VPS
+      #   uses: appleboy/scp-action@v0.1.7
+      #   with:
+      #     host: 139.59.233.100
+      #     username: root
+      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     source: "client/build/*"
+      #     target: "/var/www/html"
+
+      # Deploy backend
+      - name: Deploy backend
+        uses: appleboy/ssh-action@master
+        with:
+          host: 139.59.233.100
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd /home/olotasks.com/Server-nest
+            git pull origin develop
+            npm install
+            pm2 restart olo_tasks
